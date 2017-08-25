@@ -1,0 +1,30 @@
+{
+  "name": "fixture",
+  "version": "0.0.1",
+  "dependencies": {
+    "fake1": {
+      "version": "1.0.1",
+      "from": "foo",
+      "resolved": "foo",
+      "dependencies": {
+        "fake2": {
+          "version": "1.0.1",
+          "from": "foo",
+          "resolved": "foo",
+          "dependencies": {
+            "fake3": {
+              "version": "1.0.1",
+              "from": "foo",
+              "resolved": "foo"
+            }
+          }
+        }
+      }
+    },
+    "fake3": {
+      "version": "1.0.2",
+      "from": "foo",
+      "resolved": "foo"
+    }
+  }
+}

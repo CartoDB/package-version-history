@@ -1,7 +1,7 @@
 {
   "name": "package-version-history",
-  "version": "0.0.1",
-  "description": "",
+  "version": "0.1.0",
+  "description": "Find the versions of a package in a local git repository",
   "main": "index.js",
   "scripts": {
     "test": "ava --watch"

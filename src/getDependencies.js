@@ -2,6 +2,7 @@
 
 const fs = require('fs')
 const yarnLockfile = require('@yarnpkg/lockfile')
+const { getPackageName, arraysEquals, existsArrayInArray } = require('./utils')
 
 const YARN_LOCK  = { filename: '/yarn.lock',            type: 'yarnLock' }
 const SHRINKWRAP = { filename: '/npm-shrinkwrap.json',  type: 'json' }
@@ -54,32 +55,48 @@ function getDependencies(files) {
         return dependenciesParser(npm.dependencies)
 }
 
-function dependenciesParser(mod, dependencies) {
+function dependenciesParser(mod, dependencies, parents) {
     dependencies = dependencies || {}
+    parents = parents || []
     Object.keys(mod).forEach( (name) => {
         let realName = getPackageName(name)
         if (!dependencies.hasOwnProperty(realName)) {
-            dependencies[realName] = [];
+            dependencies[realName] = {
+                dependencies: []
+            }
         }
 
         let version = mod[name].version || mod[name]
-        if (dependencies[realName].indexOf(version) === -1) {
-            dependencies[realName].push(version)
+        if (dependencies[realName].dependencies.indexOf(version) === -1) {
+            dependencies[realName].dependencies.push(version)
+        }
+
+        let parentsBeforeChilds = parents.slice(0)
+        
+        if (parents.length) {
+            if(!dependencies[realName]['parents']) {
+                dependencies[realName]['parents'] = {}
+            }
+
+            if(!dependencies[realName].parents[version]) {
+                dependencies[realName].parents[version] = []
+            }
+    
+            if(!existsArrayInArray(parents, dependencies[realName].parents[version])) {
+                dependencies[realName].parents[version].push(parentsBeforeChilds)
+            }
         }
 
         let childDependencies = mod[name].dependencies || mod[name].requires
         if (childDependencies) {
-            dependenciesParser(childDependencies, dependencies);
+            parents.push({[realName]: version})
+            dependenciesParser(childDependencies, dependencies, parents)
         }
+
+        parents = parentsBeforeChilds
     })
-    
+
     return dependencies
+
 }
 
-function getPackageName(name) {
-    let atIndex = name.indexOf('@') || name.indexOf('#')
-    if(atIndex > 0)  
-        return name.substring(0, atIndex)
-
-    return name
-}

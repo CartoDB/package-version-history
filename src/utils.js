@@ -2,7 +2,7 @@
 
 const { exec } = require('child_process')
 
-module.exports = {
+const utils = module.exports = {
     executeCommand(command) {
         return new Promise((resolve, reject) => {
             exec(command, (err, stdout, stderr) => {
@@ -30,7 +30,60 @@ module.exports = {
         })
     },
 
-    sortVersions: sortVersions
+    sortVersions: sortVersions,
+
+    getPackageName(name) {
+        let atIndex = name.indexOf('@') || name.indexOf('#')
+        if(atIndex > 0)  
+            return name.substring(0, atIndex)
+    
+        return name
+    },
+    
+    /**
+     * Check if 2 arrays are equals
+     * Very limited function, created adhoc for this use case
+     * 
+     * @param {array} array1 
+     * @param {array} array2 
+     * 
+     * @returns {boolean}
+     */
+    arraysEquals(array1, array2) {
+        if(!array1 || !array2)
+            return false
+    
+        if(array1.length !== array2.length)
+            return false
+    
+        for (let key in array1) {
+            if (JSON.stringify(array1[key]) !== JSON.stringify(array2[key]) )
+                return false
+        }
+    
+        return true
+    },
+    
+    /**
+     * Check if the child array exists in the parent array of arrays
+     * Very limited function, created adhoc for this use case
+     * 
+     * @param {array} child 
+     * @param {array of arrays} parent 
+     * 
+     * @returns the array indexes that exists in the parent. Returns false if no exists
+     */
+    existsArrayInArray(child, parent) {
+        if(!parent || !child)
+            return false
+        
+        let filteredArrayIndex = parent.map( (array, index) => {
+            if(utils.arraysEquals(array, child))
+                return index
+        })
+    
+        return !filteredArrayIndex.length ? false : filteredArrayIndex
+    }
 }
 
 function sortVersions(versionA, versionB) {

@@ -6,7 +6,6 @@ const { executeCommand, sortByKey, sortVersions, arraysEquals } = require('./uti
 const getDependencies = require('./getDependencies')
 
 module.exports = function (repoPath, packageName) {
-    try {
     // git tag
     executeCommand(`cd ${repoPath} && git tag`)
     .then(tagsString => {
@@ -76,10 +75,6 @@ module.exports = function (repoPath, packageName) {
     }).catch(err => {
         throw new Error(`General: ${err}`)
     })
-    } catch(err) {
-        console.log('---------')
-        console.log(err)
-    }
 }
 
 
